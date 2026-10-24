@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -8,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
-const PRIVATE_APP_ACCESS = '';
+const PRIVATE_APP_ACCESS = process.env.HUBSPOT_ACCESS_TOKEN;
 
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
@@ -30,9 +31,35 @@ app.get('/update-cobj', (req, res) => {
 // TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
 
 // * Code for Route 3 goes here
-app.post('/update-cobj', (req, res) => {
-    // Step 10: send the form data to HubSpot and redirect to the homepage.
-    res.status(501).send('Plant creation coming in Step 10.');
+app.post('/update-cobj', async (req, res) => {
+    const properties = {};
+    for (const field of ['name', 'species', 'location']) {
+        properties[field] = typeof req.body[field] === 'string' ? req.body[field].trim() : '';
+    }
+
+    if (Object.values(properties).some(value => !value)) {
+        return res.status(400).send('Name, species, and location are required. Return to the form and complete all fields.');
+    }
+    if (!PRIVATE_APP_ACCESS) {
+        return res.status(500).send('Set HUBSPOT_ACCESS_TOKEN in your local .env file and restart the server.');
+    }
+
+    try {
+        await axios.post('https://api.hubapi.com/crm/v3/objects/2-283906898', {
+            properties
+        }, {
+            headers: {
+                Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 15000
+        });
+        res.redirect(303, '/');
+    } catch (error) {
+        // Log only the status: Axios error objects may contain the access token.
+        console.error('Plant creation failed. HubSpot status:', error.response?.status || 'unavailable');
+        res.status(502).send('Unable to save the plant. Check your token, permissions, and connection. Check HubSpot before retrying to avoid a duplicate.');
+    }
 });
 
 /** 
