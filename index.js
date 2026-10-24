@@ -13,14 +13,26 @@ const PRIVATE_APP_ACCESS = '';
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 // * Code for Route 1 goes here
+app.get('/', (req, res) => {
+    // Step 11: retrieve Plants records and render the homepage table.
+    res.send('Plants homepage coming in Step 11.');
+});
 
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
 // * Code for Route 2 goes here
+app.get('/update-cobj', (req, res) => {
+    // Step 9: render the updates template with the Plants form.
+    res.send('Plant form coming in Step 9.');
+});
 
 // TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
 
 // * Code for Route 3 goes here
+app.post('/update-cobj', (req, res) => {
+    // Step 10: send the form data to HubSpot and redirect to the homepage.
+    res.status(501).send('Plant creation coming in Step 10.');
+});
 
 /** 
 * * This is sample code to give you a reference for how you should structure your calls. 
