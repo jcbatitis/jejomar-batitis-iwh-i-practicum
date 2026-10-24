@@ -1,0 +1,19 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        title= title
+        link(rel="stylesheet" href="/css/style.css")
+    body
+        main.form-wrapper
+            a(href="/") Return to the homepage
+            h1 Add a plant
+            form(action="/update-cobj" method="post")
+                label(for="name") Name
+                input#name(type="text" name="name" required)
+                label(for="species") Species
+                input#species(type="text" name="species" required)
+                label(for="location") Location
+                input#location(type="text" name="location" required)
+                input(type="submit" value="Create plant")
