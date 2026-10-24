@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        title= title
+        link(rel="stylesheet" href="/css/style.css")
+    body
+        main.form-wrapper
+            a(href="/update-cobj") Add to this table
+            h1 Plants
+            if error
+                p(role="alert")= error
+            else
+                table.plants-table
+                    caption Plants in your HubSpot test account
+                    thead
+                        tr
+                            th(scope="col") Name
+                            th(scope="col") Species
+                            th(scope="col") Location
+                    tbody
+                        each plant in data
+                            tr
+                                td= plant.properties.name
+                                td= plant.properties.species
+                                td= plant.properties.location
+                        else
+                            tr
+                                td(colspan="3") No plants yet. Use the link above to add one.

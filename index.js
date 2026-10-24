@@ -14,9 +14,35 @@ const PRIVATE_APP_ACCESS = process.env.HUBSPOT_ACCESS_TOKEN;
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 // * Code for Route 1 goes here
-app.get('/', (req, res) => {
-    // Step 11: retrieve Plants records and render the homepage table.
-    res.send('Plants homepage coming in Step 11.');
+app.get('/', async (req, res) => {
+    const title = 'Plants | Integrating With HubSpot I Practicum';
+    if (!PRIVATE_APP_ACCESS) {
+        return res.status(500).render('homepage', {
+            title, data: [], error: 'Set HUBSPOT_ACCESS_TOKEN in your local .env file and restart the server.'
+        });
+    }
+
+    try {
+        const data = [];
+        let after;
+        // Follow pagination so the table includes every Plant record.
+        do {
+            const response = await axios.get('https://api.hubapi.com/crm/v3/objects/2-283906898', {
+                headers: { Authorization: `Bearer ${PRIVATE_APP_ACCESS}` },
+                params: { properties: 'name,species,location', limit: 100, after },
+                timeout: 15000
+            });
+            data.push(...response.data.results);
+            after = response.data.paging?.next?.after;
+        } while (after !== undefined && after !== null);
+
+        res.render('homepage', { title, data });
+    } catch (error) {
+        console.error('Plant retrieval failed. HubSpot status:', error.response?.status || 'unavailable');
+        res.status(502).render('homepage', {
+            title, data: [], error: 'Unable to load plants. Check your token, permissions, and connection.'
+        });
+    }
 });
 
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.

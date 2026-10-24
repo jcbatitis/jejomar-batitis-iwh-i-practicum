@@ -56,3 +56,25 @@ input[type="submit"] {
     padding: .375rem 1rem;
     margin-top: 10px;
 }
+
+.plants-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.plants-table caption {
+    text-align: left;
+    margin-bottom: .75rem;
+}
+
+.plants-table th, .plants-table td {
+    text-align: left;
+    padding: .75rem;
+    border: 1px solid lightgrey;
+    overflow-wrap: anywhere;
+}
+
+.plants-table th {
+    background-color: #f2f5f3;
+}
