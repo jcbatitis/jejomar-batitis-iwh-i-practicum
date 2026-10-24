@@ -15,5 +15,8 @@ html(lang="en")
                 label(for="species") Species
                 input#species(type="text" name="species" required)
                 label(for="location") Location
-                input#location(type="text" name="location" required)
+                select#location(name="location" required)
+                    option(value="" disabled selected) Select a location
+                    each location in locations
+                        option(value=location)= location
                 input(type="submit" value="Create plant")

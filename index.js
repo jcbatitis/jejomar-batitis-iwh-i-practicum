@@ -10,6 +10,7 @@ app.use(express.json());
 
 // * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
 const PRIVATE_APP_ACCESS = process.env.HUBSPOT_ACCESS_TOKEN;
+const LOCATIONS = ['Living room', 'Office room', 'Balcony'];
 
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
@@ -50,7 +51,8 @@ app.get('/', async (req, res) => {
 // * Code for Route 2 goes here
 app.get('/update-cobj', (req, res) => {
     res.render('updates', {
-        title: 'Update Custom Object Form | Integrating With HubSpot I Practicum'
+        title: 'Update Custom Object Form | Integrating With HubSpot I Practicum',
+        locations: LOCATIONS
     });
 });
 
@@ -65,6 +67,9 @@ app.post('/update-cobj', async (req, res) => {
 
     if (Object.values(properties).some(value => !value)) {
         return res.status(400).send('Name, species, and location are required. Return to the form and complete all fields.');
+    }
+    if (!LOCATIONS.includes(properties.location)) {
+        return res.status(400).send('Choose Living room, Office room, or Balcony for the location.');
     }
     if (!PRIVATE_APP_ACCESS) {
         return res.status(500).send('Set HUBSPOT_ACCESS_TOKEN in your local .env file and restart the server.');
@@ -84,6 +89,12 @@ app.post('/update-cobj', async (req, res) => {
     } catch (error) {
         // Log only the status: Axios error objects may contain the access token.
         console.error('Plant creation failed. HubSpot status:', error.response?.status || 'unavailable');
+        // Show validation details without logging request headers or the token.
+        const details = error.response?.data;
+        if (details && typeof details.message === 'string') {
+            const message = details.message.split(PRIVATE_APP_ACCESS).join('[REDACTED]');
+            console.error('HubSpot validation message:', message);
+        }
         res.status(502).send('Unable to save the plant. Check your token, permissions, and connection. Check HubSpot before retrying to avoid a duplicate.');
     }
 });
